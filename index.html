@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="loading.css">
   <title>Chat Room By Al Kayes Rifat</title>
   <style>
     /* General page styling */
@@ -22,22 +21,8 @@
       margin-bottom: 20px;
       font-weight: bold;
     }
-
-    /* Loader styling */
-    #loader-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: white;  /* White background */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 20; /* Ensure loader is on top */
-    }
-
-    /* Overlay styling for username */
+    
+    /* Overlay styling */
     #overlay {
       position: fixed;
       top: 0;
@@ -45,12 +30,11 @@
       width: 100%;
       height: 100%;
       background-color: rgba(0, 0, 0, 0.5);
-      display: none; /* Hide overlay initially */
+      display: flex;
       justify-content: center;
       align-items: center;
       z-index: 10;
     }
-
     #username-container {
       background: #ffffff;
       padding: 40px 30px;
@@ -165,11 +149,7 @@
   </style>
 </head>
 <body>
-  
-  <!-- Loader container with white background -->
-  <div id="loader-container">
-    <div class="loader"></div> <!-- Assuming your loader is defined in loading.css -->
-  </div>
+
 
   <!-- Username overlay -->
   <div id="overlay">
