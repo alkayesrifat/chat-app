@@ -3,11 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Chat Room By Al Kayes Rifat</title> <!-- Meta tags for responsiveness -->
+    <title>Chat Room By Al Kayes Rifat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Include Google Fonts for better typography -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <!-- Inline CSS -->
     <style>
         /* Reset CSS */
         * {
@@ -18,14 +16,14 @@
 
         /* Root variables for easy theming */
         :root {
-            --primary-color: #4A90E2;
-            --primary-dark-color: #357ABD;
-            --secondary-color: #F5F7FA;
-            --background-color: #FFFFFF;
+            --primary-color: #007bff;
+            --primary-dark-color: #0056b3;
+            --secondary-color: #f8f9fa;
+            --background-color: #ffffff;
             --text-color: #333;
-            --message-user-bg: #DCF8C6;
-            --message-other-bg: #EAEAEA;
-            --message-text-color: #000;
+            --message-user-bg: #007bff;
+            --message-other-bg: #e9ecef;
+            --message-text-color: #ffffff;
         }
 
         /* General Styles */
@@ -45,7 +43,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(245, 247, 250, 0.95);
+            background-color: rgba(248, 249, 250, 0.95);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -105,7 +103,6 @@
             flex-direction: column;
             flex: 1;
             display: none;
-            /* Hidden by default, shown after username is set */
         }
 
         #chat {
@@ -177,6 +174,7 @@
 
         .message.user {
             background-color: var(--message-user-bg);
+            color: var(--message-text-color);
             align-self: flex-end;
             border-bottom-right-radius: 5px;
         }
@@ -276,24 +274,115 @@
     </style>
 </head>
 
-<body> <!-- Username overlay -->
+<body>
     <div id="overlay">
         <div id="username-container">
-            <h3>Enter Your Username</h3> <input id="username-input" placeholder="Type your username..." /> <button
-                id="username-submit">Enter Chat</button>
+            <h3>Enter Your Username</h3>
+            <input id="username-input" placeholder="Type your username..." />
+            <button id="username-submit">Enter Chat</button>
         </div>
-    </div> <!-- Chat container -->
+    </div>
     <div id="chat-container">
         <div id="chat"></div>
-        <form id="form" action=""> <input id="input" autocomplete="off" placeholder="Type a message..." /> <input
-                type="file" id="imageInput" accept="image/*" /> <button id="send">Send</button> <button type="button"
-                id="record">🎤 Record Voice</button> </form>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" placeholder="Type a message..." />
+            <input type="file" id="imageInput" accept="image/*" />
+            <button id="send">Send</button>
+            <button type="button" id="record">🎤 Record Voice</button>
+        </form>
     </div>
-    <footer> Developed by <a href="https://www.facebook.com/alkayesrifat" target="_blank">Al Kayes Rifat</a> | <a
-            href="https://alkayesrifat.netlify.app/" target="_blank">My Website</a> </footer>
-    <!-- Include Socket.IO script -->
-    <script src="/socket.io/socket.io.js"></script> <!-- Inline JavaScript -->
-    <script> const socket = io(); let username; const form = document.getElementById('form'); const input = document.getElementById('input'); const imageInput = document.getElementById('imageInput'); const chat = document.getElementById('chat'); const recordButton = document.getElementById('record'); let mediaRecorder; let audioChunks = []; // Set username document.getElementById('username-submit').addEventListener('click', () => { username = document.getElementById('username-input').value.trim(); if (username) { document.getElementById('overlay').style.display = 'none'; document.getElementById('chat-container').style.display = 'flex'; } }); // Handle form submission form.addEventListener('submit', function(e) { e.preventDefault(); if (input.value || imageInput.files[0]) { const messageData = { user: username, message: input.value }; // Handle image file if (imageInput.files[0]) { const reader = new FileReader(); reader.onload = function(event) { messageData.image = event.target.result; socket.emit('chat message', messageData); }; reader.readAsDataURL(imageInput.files[0]); imageInput.value = ''; // Clear file input after sending } else { socket.emit('chat message', messageData); } input.value = ''; } }); // Handle recording audio recordButton.addEventListener('click', () => { if (!mediaRecorder || mediaRecorder.state === 'inactive') { navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => { mediaRecorder = new MediaRecorder(stream); mediaRecorder.start(); recordButton.textContent = '⏹️ Stop Recording'; mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data); mediaRecorder.onstop = () => { const audioBlob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' }); audioChunks = []; // Reset chunks for next recording const reader = new FileReader(); reader.onloadend = function() { socket.emit('chat message', { user: username, audio: reader.result }); }; reader.readAsDataURL(audioBlob); recordButton.textContent = '🎤 Record Voice'; }; }); } else { mediaRecorder.stop(); } }); // Display messages socket.on('chat message', function(data) { const messageContainer = document.createElement('div'); messageContainer.classList.add('message-container'); const message = document.createElement('div'); message.classList.add('message', data.user === username ? 'user' : 'other'); // Text message if (data.message) { const messageText = document.createElement('span'); messageText.textContent = data.message; message.appendChild(messageText); } // Image message if (data.image) { const img = document.createElement('img'); img.src = data.image; message.appendChild(img); } // Audio message if (data.audio) { const audio = document.createElement('audio'); audio.controls = true; audio.src = data.audio; message.appendChild(audio); } messageContainer.appendChild(message); chat.appendChild(messageContainer); chat.scrollTop = chat.scrollHeight; }); </script>
+    <footer>
+        Developed by <a href="https://www.facebook.com/alkayesrifat" target="_blank">Al Kayes Rifat</a> |
+        <a href="https://alkayesrifat.netlify.app/" target="_blank">My Website</a>
+    </footer>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let username;
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const imageInput = document.getElementById('imageInput');
+        const chat = document.getElementById('chat');
+        const recordButton = document.getElementById('record');
+        let mediaRecorder;
+        let audioChunks = [];
+
+        document.getElementById('username-submit').addEventListener('click', () => {
+            username = document.getElementById('username-input').value.trim();
+            if (username) {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('chat-container').style.display = 'flex';
+            }
+        });
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (input.value || imageInput.files[0]) {
+                const messageData = { user: username, message: input.value };
+                if (imageInput.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        messageData.image = event.target.result;
+                        socket.emit('chat message', messageData);
+                    };
+                    reader.readAsDataURL(imageInput.files[0]);
+                    imageInput.value = '';
+                } else {
+                    socket.emit('chat message', messageData);
+                }
+                input.value = '';
+            }
+        });
+
+        recordButton.addEventListener('click', () => {
+            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+                navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    mediaRecorder.start();
+                    recordButton.textContent = '⏹️ Stop Recording';
+                    mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
+                        audioChunks = [];
+                        const reader = new FileReader();
+                        reader.onloadend = function () {
+                            socket.emit('chat message', { user: username, audio: reader.result });
+                        };
+                        reader.readAsDataURL(audioBlob);
+                        recordButton.textContent = '🎤 Record Voice';
+                    };
+                });
+            } else {
+                mediaRecorder.stop();
+            }
+        });
+
+        socket.on('chat message', function (data) {
+            const messageContainer = document.createElement('div');
+            messageContainer.classList.add('message-container');
+            const message = document.createElement('div');
+            message.classList.add('message', data.user === username ? 'user' : 'other');
+            if (data.message) {
+                const messageText = document.createElement('span');
+                messageText.textContent = data.message;
+                message.appendChild(messageText);
+            }
+            if (data.image) {
+                const img = document.createElement('img');
+                img.src = data.image;
+                message.appendChild(img);
+            }
+            if (data.audio) {
+                const audio = document.createElement('audio');
+                audio.controls = true;
+                audio.src = data.audio;
+                message.appendChild(audio);
+            }
+            messageContainer.appendChild(message);
+            chat.appendChild(messageContainer);
+            chat.scrollTop = chat.scrollHeight;
+        });
+    </script>
 </body>
 
 </html>
