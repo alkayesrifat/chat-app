@@ -6,220 +6,153 @@
     <title>Chat Room By Al Kayes Rifat</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        /* Reset CSS */
+     <style>
+        /* Reset and Global Styles */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Root variables for easy theming */
         :root {
-            --primary-color: #007bff; /* Blue color for buttons and user messages */
-            --primary-dark-color: #0056b3; /* Darker blue for hover states */
-            --secondary-color: #f8f9fa; /* Light background color */
-            --background-color: #ffffff; /* White background */
-            --text-color: #333; /* Dark text color */
-            --message-user-bg: #007bff; /* User message background */
-            --message-other-bg: #e9ecef; /* Other message background */
-            --message-text-color: #ffffff; /* User message text color */
+            --primary-color: #34c759;
+            --secondary-color: #f0fdf4;
+            --input-bg-color: #f1f5f9;
+            --button-bg-color: #34c759;
+            --button-text-color: #fff;
+            --text-color: #333;
         }
 
-        /* General Styles */
         body {
-            font-family: 'Roboto', Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
             background-color: var(--secondary-color);
-            color: var(--text-color);
-            height: 100vh;
             display: flex;
             flex-direction: column;
+            height: 100vh;
+            color: var(--text-color);
         }
 
-        /* Overlay styling for username input */
-        #overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(248, 249, 250, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        #username-container {
-            background: var(--background-color);
-            padding: 40px 30px;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        #username-container h3 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-
-        #username-input {
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-
-        #username-input:focus {
-            border-color: var(--primary-color);
-        }
-
-        #username-submit {
-            width: 100%;
-            padding: 15px;
-            margin-top: 20px;
-            border: none;
-            border-radius: 5px;
+        /* Header Styles */
+        #header {
             background-color: var(--primary-color);
             color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
+            text-align: center;
+            padding: 15px;
+            font-size: 20px;
+            font-weight: bold;
         }
 
-        #username-submit:hover {
-            background-color: var(--primary-dark-color);
-        }
-
-        /* Chat container styling */
+        /* Chat Container */
         #chat-container {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            flex: 1;
-            display: none;
+            overflow: hidden;
         }
 
         #chat {
             flex: 1;
             overflow-y: auto;
-            padding: 20px;
-            background-color: var(--background-color);
+            padding: 15px;
         }
 
-        #form {
-            display: flex;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: var(--background-color);
-            border-top: 1px solid #ccc;
-        }
-
-        #input,
-        #imageInput {
-            flex: 1;
-            padding: 12px 15px;
-            font-size: 16px;
-            border-radius: 25px;
-            border: 1px solid #ccc;
-            outline: none;
-            margin-right: 10px;
-            transition: border-color 0.3s;
-        }
-
-        #input:focus,
-        #imageInput:focus {
-            border-color: var(--primary-color);
-        }
-
-        #send,
-        #record {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
-            background-color: var(--primary-color);
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-left: 5px;
-            transition: background-color 0.3s;
-        }
-
-        #send:hover,
-        #record:hover {
-            background-color: var(--primary-dark-color);
-        }
-
-        /* Message bubble styling */
         .message-container {
+            margin-bottom: 12px;
             display: flex;
-            flex-direction: column;
-            margin-bottom: 15px;
+        }
+
+        .message-container.user {
+            justify-content: flex-end;
         }
 
         .message {
-            display: inline-block;
-            padding: 12px 20px;
-            border-radius: 25px;
-            max-width: 80%;
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 12px;
+            font-size: 14px;
             word-wrap: break-word;
-            position: relative;
-            font-size: 16px;
         }
 
         .message.user {
-            background-color: var(--message-user-bg);
-            color: var(--message-text-color);
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
+            background-color: #d1fae5;
+            color: var(--text-color);
+            border-bottom-right-radius: 0;
         }
 
         .message.other {
-            background-color: var(--message-other-bg);
-            align-self: flex-start;
-            border-bottom-left-radius: 5px;
+            background-color: #e2e8f0;
+            color: var(--text-color);
+            border-bottom-left-radius: 0;
         }
 
-        .message.user::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            right: -10px;
-            width: 0;
-            height: 0;
-            border-left: 10px solid var(--message-user-bg);
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
+        /* Input Form */
+        #form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background-color: white;
+            border-top: 1px solid #ccc;
         }
 
-        .message.other::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: -10px;
-            width: 0;
-            height: 0;
-            border-right: 10px solid var(--message-other-bg);
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
+        #input {
+            flex: 1;
+            padding: 10px;
+            font-size: 14px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+            outline: none;
+            background-color: var(--input-bg-color);
         }
 
-        .message img,
-        .message audio {
-            max-width: 100%;
-            border-radius: 15px;
-            margin-top: 10px;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        button {
+            background-color: var(--button-bg-color);
+            color: var(--button-text-color);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            white-space: nowrap;
         }
 
-        /* Scrollbar styling */
+        button:hover {
+            background-color: #28a745;
+        }
+
+        #image-upload-button,
+        #record {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            background-color: white;
+            border-top: 1px solid #ccc;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Scrollbar Customization */
         #chat::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
 
         #chat::-webkit-scrollbar-thumb {
@@ -227,48 +160,19 @@
             border-radius: 4px;
         }
 
-        /* Footer styling */
-        footer {
-            text-align: center;
-            padding: 10px;
-            font-size: 14px;
-            color: #555;
-            background-color: var(--background-color);
-        }
-
-        footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive design */
+        /* Responsive Design */
         @media (max-width: 768px) {
             #form {
-                flex-direction: column;
-                padding: 10px;
+                flex-wrap: wrap;
             }
 
-            #input,
-            #imageInput {
-                margin-right: 0;
+            #input {
+                flex: 1 100%;
                 margin-bottom: 10px;
-                border-radius: 5px;
             }
 
-            #send,
-            #record {
-                width: 100%;
-                margin-left: 0;
-                margin-bottom: 10px;
-                border-radius: 5px;
-            }
-
-            .message {
-                max-width: 100%;
+            button {
+                flex: 1;
             }
         }
     </style>
