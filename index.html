@@ -35,6 +35,47 @@
       color: var(--text-color);
     }
 
+    /* Overlay for Username */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+    }
+
+    #username-container {
+      text-align: center;
+      background: white;
+      color: var(--text-color);
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    #username-container input {
+      padding: 10px;
+      margin: 10px 0;
+      width: 80%;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    #username-container button {
+      background-color: var(--button-bg-color);
+      color: var(--button-text-color);
+      padding: 10px 20px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+    }
+
     /* Header Styles */
     #header {
       background-color: var(--primary-color);
@@ -48,7 +89,7 @@
     /* Chat Container */
     #chat-container {
       flex: 1;
-      display: flex;
+      display: none;
       flex-direction: column;
       overflow: hidden;
     }
@@ -116,18 +157,10 @@
       border-radius: 20px;
       font-size: 14px;
       cursor: pointer;
-      white-space: nowrap;
     }
 
     button:hover {
       background-color: #28a745;
-    }
-
-    #image-upload-button,
-    #record {
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
     #imageInput {
@@ -181,22 +214,27 @@
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <div id="header">You are connected! Say Hi! 💬</div>
+  <!-- Username Overlay -->
+  <div id="overlay">
+    <div id="username-container">
+      <h3>Enter Your Username</h3>
+      <input id="username-input" placeholder="Type your username..." />
+      <button id="username-submit">Enter Chat</button>
+    </div>
+  </div>
 
   <!-- Chat Container -->
   <div id="chat-container">
+    <div id="header">You are connected! Say Hi! 💬</div>
     <div id="chat"></div>
     <form id="form">
-      <input id="input" type="text" placeholder="Type a message..." autocomplete="off" />
-      <button type="button" id="image-upload-button">📷 Upload</button>
+      <input id="input" type="text" autocomplete="off" placeholder="Type a message..." />
       <input type="file" id="imageInput" accept="image/*" />
-      <button type="button" id="record">🎤 Record</button>
+      <button type="button" id="record">🎤 Record Voice</button>
       <button type="submit" id="send">Send</button>
     </form>
   </div>
 
-  <!-- Footer -->
   <footer>
     Developed by <a href="https://www.facebook.com/alkayesrifat" target="_blank">Al Kayes Rifat</a> |
     <a href="https://alkayesrifat.netlify.app/" target="_blank">My Website</a>
@@ -211,51 +249,47 @@
     const form = document.getElementById('form');
     const input = document.getElementById('input');
     const imageInput = document.getElementById('imageInput');
-    const imageUploadButton = document.getElementById('image-upload-button');
-    const chat = document.getElementById('chat');
     const recordButton = document.getElementById('record');
-    let mediaRecorder;
-    let audioChunks = [];
+    const sendButton = document.getElementById('send');
+    const chat = document.getElementById('chat');
+    let username;
 
-    // Open file selector
-    imageUploadButton.addEventListener('click', () => {
-      imageInput.click();
+    // Username Submission
+    document.getElementById('username-submit').addEventListener('click', () => {
+      username = document.getElementById('username-input').value.trim();
+      if (username) {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('chat-container').style.display = 'flex';
+      }
     });
 
-    // Send messages on form submission or Enter key press
+    // Send Message
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       sendMessage();
     });
 
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault(); // Prevent form submission on Enter key
-        sendMessage();
-      }
-    });
-
     function sendMessage() {
-      const messageText = input.value.trim();
-      if (messageText) {
-        socket.emit('chat message', { message: messageText });
-        input.value = ''; // Clear input field after sending
+      const text = input.value.trim();
+      if (text) {
+        socket.emit('chat message', { user: username, message: text });
+        input.value = '';
       }
     }
 
-    // Add messages to chat
-    socket.on('chat message', (data) => {
-      const messageContainer = document.createElement('div');
-      messageContainer.className = 'message-container';
-
-      const message = document.createElement('div');
-      message.className = `message ${data.user ? 'user' : 'other'}`;
-      message.textContent = data.message;
-      
-      messageContainer.appendChild(message);
-      chat.appendChild(messageContainer);
-      chat.scrollTop = chat.scrollHeight;
+    // Upload Image
+    imageInput.addEventListener('change', () => {
+      if (imageInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          socket.emit('chat message', { user: username, image: reader.result });
+        };
+        reader.readAsDataURL(imageInput.files[0]);
+        imageInput.value = '';
+      }
     });
+
+    // Handle Record Button (to be extended)
   </script>
 </body>
 </html>
