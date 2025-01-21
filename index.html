@@ -3,160 +3,225 @@
 
 <head>
     <meta charset="UTF-8">
+    <title>Chat Room By Al Kayes Rifat</title> <!-- Meta tags for responsiveness -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Room by Al Kayes Rifat</title>
-    
-    <!-- Google Fonts -->
+    <!-- Include Google Fonts for better typography -->
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    
     <!-- Inline CSS -->
     <style>
-        /* Reset and Global Styles */
+        /* Reset CSS */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        /* Root variables for easy theming */
         :root {
-            --primary-color: #34c759;
-            --secondary-color: #f0fdf4;
-            --input-bg-color: #f1f5f9;
-            --button-bg-color: #34c759;
-            --button-text-color: #fff;
+            --primary-color: #4A90E2;
+            --primary-dark-color: #357ABD;
+            --secondary-color: #F5F7FA;
+            --background-color: #FFFFFF;
             --text-color: #333;
+            --message-user-bg: #DCF8C6;
+            --message-other-bg: #EAEAEA;
+            --message-text-color: #000;
         }
 
+        /* General Styles */
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Roboto', Arial, sans-serif;
             background-color: var(--secondary-color);
+            color: var(--text-color);
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            height: 100vh;
-            color: var(--text-color);
         }
 
-        /* Header Styles */
-        #header {
+        /* Overlay styling for username input */
+        #overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(245, 247, 250, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        #username-container {
+            background: var(--background-color);
+            padding: 40px 30px;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        #username-container h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        #username-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        #username-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        #username-submit {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 5px;
             background-color: var(--primary-color);
             color: white;
-            text-align: center;
-            padding: 15px;
-            font-size: 20px;
-            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        /* Chat Container */
+        #username-submit:hover {
+            background-color: var(--primary-dark-color);
+        }
+
+        /* Chat container styling */
         #chat-container {
-            flex: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            flex: 1;
+            display: none;
+            /* Hidden by default, shown after username is set */
         }
 
         #chat {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 20px;
+            background-color: var(--background-color);
         }
 
-        .message-container {
-            margin-bottom: 12px;
-            display: flex;
-        }
-
-        .message-container.user {
-            justify-content: flex-end;
-        }
-
-        .message {
-            max-width: 70%;
-            padding: 10px 15px;
-            border-radius: 12px;
-            font-size: 14px;
-            word-wrap: break-word;
-        }
-
-        .message.user {
-            background-color: #d1fae5;
-            color: var(--text-color);
-            border-bottom-right-radius: 0;
-        }
-
-        .message.other {
-            background-color: #e2e8f0;
-            color: var(--text-color);
-            border-bottom-left-radius: 0;
-        }
-
-        /* Input Form */
         #form {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px;
-            background-color: white;
+            padding: 10px 20px;
+            background-color: var(--background-color);
             border-top: 1px solid #ccc;
         }
 
-        #input {
+        #input,
+        #imageInput {
             flex: 1;
-            padding: 10px;
-            font-size: 14px;
-            border-radius: 20px;
+            padding: 12px 15px;
+            font-size: 16px;
+            border-radius: 25px;
             border: 1px solid #ccc;
             outline: none;
-            background-color: var(--input-bg-color);
+            margin-right: 10px;
+            transition: border-color 0.3s;
         }
 
-        button {
-            background-color: var(--button-bg-color);
-            color: var(--button-text-color);
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 14px;
-            cursor: pointer;
-            white-space: nowrap;
+        #input:focus,
+        #imageInput:focus {
+            border-color: var(--primary-color);
         }
 
-        button:hover {
-            background-color: #28a745;
-        }
-
-        #image-upload-button,
+        #send,
         #record {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin-left: 5px;
+            transition: background-color 0.3s;
+        }
+
+        #send:hover,
+        #record:hover {
+            background-color: var(--primary-dark-color);
+        }
+
+        /* Message bubble styling */
+        .message-container {
             display: flex;
-            align-items: center;
-            justify-content: center;
+            flex-direction: column;
+            margin-bottom: 15px;
         }
 
-        #imageInput {
-            display: none;
+        .message {
+            display: inline-block;
+            padding: 12px 20px;
+            border-radius: 25px;
+            max-width: 80%;
+            word-wrap: break-word;
+            position: relative;
+            font-size: 16px;
         }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 10px;
-            font-size: 14px;
-            background-color: white;
-            border-top: 1px solid #ccc;
+        .message.user {
+            background-color: var(--message-user-bg);
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
         }
 
-        footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
+        .message.other {
+            background-color: var(--message-other-bg);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
         }
 
-        footer a:hover {
-            text-decoration: underline;
+        .message.user::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            right: -10px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid var(--message-user-bg);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
         }
 
-        /* Scrollbar Customization */
+        .message.other::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: -10px;
+            width: 0;
+            height: 0;
+            border-right: 10px solid var(--message-other-bg);
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+        }
+
+        .message img,
+        .message audio {
+            max-width: 100%;
+            border-radius: 15px;
+            margin-top: 10px;
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Scrollbar styling */
         #chat::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
 
         #chat::-webkit-scrollbar-thumb {
@@ -164,101 +229,71 @@
             border-radius: 4px;
         }
 
-        /* Responsive Design */
+        /* Footer styling */
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            color: #555;
+            background-color: var(--background-color);
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive design */
         @media (max-width: 768px) {
             #form {
-                flex-wrap: wrap;
+                flex-direction: column;
+                padding: 10px;
             }
 
-            #input {
-                flex: 1 100%;
+            #input,
+            #imageInput {
+                margin-right: 0;
                 margin-bottom: 10px;
+                border-radius: 5px;
             }
 
-            button {
-                flex: 1;
+            #send,
+            #record {
+                width: 100%;
+                margin-left: 0;
+                margin-bottom: 10px;
+                border-radius: 5px;
+            }
+
+            .message {
+                max-width: 100%;
             }
         }
     </style>
 </head>
 
-<body>
-    <!-- Header -->
-    <div id="header">You are connected! Say Hi! 💬</div>
-
-    <!-- Chat Container -->
+<body> <!-- Username overlay -->
+    <div id="overlay">
+        <div id="username-container">
+            <h3>Enter Your Username</h3> <input id="username-input" placeholder="Type your username..." /> <button
+                id="username-submit">Enter Chat</button>
+        </div>
+    </div> <!-- Chat container -->
     <div id="chat-container">
         <div id="chat"></div>
-        <form id="form">
-            <input id="input" type="text" placeholder="Type a message..." autocomplete="off" />
-            <button type="button" id="image-upload-button">📷 Upload</button>
-            <input type="file" id="imageInput" accept="image/*" />
-            <button type="button" id="record">🎤 Record</button>
-            <button type="submit" id="send">Send</button>
-        </form>
+        <form id="form" action=""> <input id="input" autocomplete="off" placeholder="Type a message..." /> <input
+                type="file" id="imageInput" accept="image/*" /> <button id="send">Send</button> <button type="button"
+                id="record">🎤 Record Voice</button> </form>
     </div>
-
-    <!-- Footer -->
-    <footer>
-        Developed by <a href="https://www.facebook.com/alkayesrifat" target="_blank">Al Kayes Rifat</a> |
-        <a href="https://alkayesrifat.netlify.app/" target="_blank">My Website</a>
-    </footer>
-
-    <!-- Socket.IO -->
-    <script src="/socket.io/socket.io.js"></script>
-
-    <!-- JavaScript -->
-    <script>
-        const socket = io();
-        const form = document.getElementById('form');
-        const input = document.getElementById('input');
-        const imageInput = document.getElementById('imageInput');
-        const imageUploadButton = document.getElementById('image-upload-button');
-        const chat = document.getElementById('chat');
-        const recordButton = document.getElementById('record');
-        let mediaRecorder;
-        let audioChunks = [];
-
-        // Open file selector
-        imageUploadButton.addEventListener('click', () => {
-            imageInput.click();
-        });
-
-        // Send messages on form submission or Enter key press
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            sendMessage();
-        });
-
-        input.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault(); // Prevent form submission on Enter key
-                sendMessage();
-            }
-        });
-
-        function sendMessage() {
-            const messageText = input.value.trim();
-            if (messageText) {
-                socket.emit('chat message', { message: messageText });
-                input.value = ''; // Clear input field after sending
-            }
-        }
-
-        // Add messages to chat
-        socket.on('chat message', (data) => {
-            const messageContainer = document.createElement('div');
-            messageContainer.className = 'message-container';
-
-            const message = document.createElement('div');
-            message.className = `message ${data.user ? 'user' : 'other'}`;
-            message.textContent = data.message;
-            
-            messageContainer.appendChild(message);
-            chat.appendChild(messageContainer);
-            chat.scrollTop = chat.scrollHeight;
-        });
-    </script>
+    <footer> Developed by <a href="https://www.facebook.com/alkayesrifat" target="_blank">Al Kayes Rifat</a> | <a
+            href="https://alkayesrifat.netlify.app/" target="_blank">My Website</a> </footer>
+    <!-- Include Socket.IO script -->
+    <script src="/socket.io/socket.io.js"></script> <!-- Inline JavaScript -->
+    <script> const socket = io(); let username; const form = document.getElementById('form'); const input = document.getElementById('input'); const imageInput = document.getElementById('imageInput'); const chat = document.getElementById('chat'); const recordButton = document.getElementById('record'); let mediaRecorder; let audioChunks = []; // Set username document.getElementById('username-submit').addEventListener('click', () => { username = document.getElementById('username-input').value.trim(); if (username) { document.getElementById('overlay').style.display = 'none'; document.getElementById('chat-container').style.display = 'flex'; } }); // Handle form submission form.addEventListener('submit', function(e) { e.preventDefault(); if (input.value || imageInput.files[0]) { const messageData = { user: username, message: input.value }; // Handle image file if (imageInput.files[0]) { const reader = new FileReader(); reader.onload = function(event) { messageData.image = event.target.result; socket.emit('chat message', messageData); }; reader.readAsDataURL(imageInput.files[0]); imageInput.value = ''; // Clear file input after sending } else { socket.emit('chat message', messageData); } input.value = ''; } }); // Handle recording audio recordButton.addEventListener('click', () => { if (!mediaRecorder || mediaRecorder.state === 'inactive') { navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => { mediaRecorder = new MediaRecorder(stream); mediaRecorder.start(); recordButton.textContent = '⏹️ Stop Recording'; mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data); mediaRecorder.onstop = () => { const audioBlob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' }); audioChunks = []; // Reset chunks for next recording const reader = new FileReader(); reader.onloadend = function() { socket.emit('chat message', { user: username, audio: reader.result }); }; reader.readAsDataURL(audioBlob); recordButton.textContent = '🎤 Record Voice'; }; }); } else { mediaRecorder.stop(); } }); // Display messages socket.on('chat message', function(data) { const messageContainer = document.createElement('div'); messageContainer.classList.add('message-container'); const message = document.createElement('div'); message.classList.add('message', data.user === username ? 'user' : 'other'); // Text message if (data.message) { const messageText = document.createElement('span'); messageText.textContent = data.message; message.appendChild(messageText); } // Image message if (data.image) { const img = document.createElement('img'); img.src = data.image; message.appendChild(img); } // Audio message if (data.audio) { const audio = document.createElement('audio'); audio.controls = true; audio.src = data.audio; message.appendChild(audio); } messageContainer.appendChild(message); chat.appendChild(messageContainer); chat.scrollTop = chat.scrollHeight; }); </script>
 </body>
 
 </html>
