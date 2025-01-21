@@ -3,312 +3,84 @@
 <head>
   <meta charset="UTF-8">
   <title>Chat Room By Al Kayes Rifat</title>
-  
-  <!-- Meta tags for responsiveness -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Include Google Fonts for better typography -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-  
-  <!-- Inline CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    /* Reset CSS */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    /* Root variables for easy theming */
-    :root {
-      --primary-color: #4A90E2;
-      --primary-dark-color: #357ABD;
-      --secondary-color: #F5F7FA;
-      --background-color: #FFFFFF;
-      --text-color: #333;
-      --message-user-bg: #DCF8C6;
-      --message-other-bg: #EAEAEA;
-      --message-text-color: #000;
-    }
-
-    /* General Styles */
     body {
-      font-family: 'Roboto', Arial, sans-serif;
-      background-color: var(--secondary-color);
-      color: var(--text-color);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* Overlay styling for username input */
-    #overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(245, 247, 250, 0.95);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    #username-container {
-      background: var(--background-color);
-      padding: 40px 30px;
-      width: 90%;
-      max-width: 400px;
-      border-radius: 10px;
-      text-align: center;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    }
-
-    #username-container h3 {
-      font-size: 24px;
-      margin-bottom: 20px;
-    }
-
-    #username-input {
-      width: 100%;
-      padding: 15px;
-      font-size: 16px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      margin-top: 10px;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-
-    #username-input:focus {
-      border-color: var(--primary-color);
-    }
-
-    #username-submit {
-      width: 100%;
-      padding: 15px;
-      margin-top: 20px;
-      border: none;
-      border-radius: 5px;
-      background-color: var(--primary-color);
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
-
-    #username-submit:hover {
-      background-color: var(--primary-dark-color);
-    }
-
-    /* Chat container styling */
-    #chat-container {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      display: none; /* Hidden by default, shown after username is set */
-    }
-
-    #chat {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px;
-      background-color: var(--background-color);
-    }
-
-    #form {
-      display: flex;
-      align-items: center;
-      padding: 10px 20px;
-      background-color: var(--background-color);
-      border-top: 1px solid #ccc;
-    }
-
-    #input, #imageInput {
-      flex: 1;
-      padding: 12px 15px;
-      font-size: 16px;
-      border-radius: 25px;
-      border: 1px solid #ccc;
-      outline: none;
-      margin-right: 10px;
-      transition: border-color 0.3s;
-    }
-
-    #input:focus, #imageInput:focus {
-      border-color: var(--primary-color);
-    }
-
-    #send, #record {
-      padding: 12px 20px;
-      border: none;
-      border-radius: 25px;
-      background-color: var(--primary-color);
-      color: white;
-      font-size: 16px;
-      cursor: pointer;
-      margin-left: 5px;
-      transition: background-color 0.3s;
-    }
-
-    #send:hover, #record:hover {
-      background-color: var(--primary-dark-color);
-    }
-
-    /* Message bubble styling */
-    .message-container {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 15px;
-    }
-
-    .message {
-      display: inline-block;
-      padding: 12px 20px;
-      border-radius: 25px;
-      max-width: 80%;
-      word-wrap: break-word;
-      position: relative;
-      font-size: 16px;
-    }
-
-    .message.user {
-      background-color: var(--message-user-bg);
-      align-self: flex-end;
-      border-bottom-right-radius: 5px;
-    }
-
-    .message.other {
-      background-color: var(--message-other-bg);
-      align-self: flex-start;
-      border-bottom-left-radius: 5px;
-    }
-
-    .message.user::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      right: -10px;
-      width: 0;
-      height: 0;
-      border-left: 10px solid var(--message-user-bg);
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent;
-    }
-
-    .message.other::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: -10px;
-      width: 0;
-      height: 0;
-      border-right: 10px solid var(--message-other-bg);
-      border-top: 10px solid transparent;
-      border-bottom: 10px solid transparent;
-    }
-
-    .message img, .message audio {
-      max-width: 100%;
-      border-radius: 15px;
-      margin-top: 10px;
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Scrollbar styling */
-    #chat::-webkit-scrollbar {
-      width: 8px;
-    }
-
-    #chat::-webkit-scrollbar-thumb {
-      background-color: rgba(0, 0, 0, 0.2);
-      border-radius: 4px;
-    }
-
-    /* Footer styling */
-    footer {
-      text-align: center;
-      padding: 10px;
-      font-size: 14px;
-      color: #555;
-      background-color: var(--background-color);
-    }
-
-    footer a {
-      color: var(--primary-color);
-      text-decoration: none;
-    }
-
-    footer a:hover {
-      text-decoration: underline;
-    }
-
-    /* Responsive design */
-    @media (max-width: 768px) {
-      #form {
-        flex-direction: column;
-        padding: 10px;
-      }
-
-      #input, #imageInput {
-        margin-right: 0;
-        margin-bottom: 10px;
-        border-radius: 5px;
-      }
-
-      #send, #record {
-        width: 100%;
-        margin-left: 0;
-        margin-bottom: 10px;
-        border-radius: 5px;
-      }
-
-      .message {
-        max-width: 100%;
-      }
+      background-image: url('https://www.transparenttextures.com/patterns/swirl-pattern.png');
+      background-color: #d3f5e3;
     }
   </style>
-  
 </head>
-<body>
+<body class="font-sans">
   <!-- Username overlay -->
-  <div id="overlay">
-    <div id="username-container">
-      <h3>Enter Your Username</h3>
-      <input id="username-input" placeholder="Type your username..." />
-      <button id="username-submit">Enter Chat</button>
+  <div id="overlay" class="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-95 z-50">
+    <div id="username-container" class="bg-white p-8 rounded-lg shadow-lg text-center w-11/12 max-w-md">
+      <h3 class="text-2xl font-bold mb-4">Enter Your Username</h3>
+      <input id="username-input" class="w-full px-4 py-2 border rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your username..." />
+      <button id="username-submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">Enter Chat</button>
     </div>
   </div>
 
   <!-- Chat container -->
-  <div id="chat-container">
-    <div id="chat"></div>
-    <form id="form" action="">
-      <input id="input" autocomplete="off" placeholder="Type a message..." />
-      <input type="file" id="imageInput" accept="image/*" />
-      <button id="send">Send</button>
-      <button type="button" id="record">🎤 Record Voice</button>
-    </form>
+  <div id="chat-container" class="flex flex-col h-screen hidden">
+    <!-- Top Notification Bar -->
+    <div class="bg-green-500 text-white text-sm p-2 text-center">
+      You are connected! Say Hi! 💎
+    </div>
+
+    <!-- Chat Messages -->
+    <div id="chat" class="flex-1 overflow-y-auto p-4 bg-green-50">
+      <!-- Messages will be dynamically inserted here -->
+    </div>
+
+    <!-- Input Bar -->
+    <div class="flex items-center bg-gray-100 p-2 border-t border-gray-300">
+      <button class="bg-blue-500 text-white px-4 py-2 mr-2 rounded hover:bg-blue-600">ESC</button>
+      <input id="input" class="flex-1 border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type a message..." autocomplete="off" />
+      
+      <!-- Send Voice Button -->
+      <button id="record" class="bg-blue-500 text-white p-2 ml-2 rounded hover:bg-blue-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0-4H3m15 0h3m-3-7a7 7 0 00-7-7m0 0a7 7 0 00-7 7m7-7v4m0-4h14m-14 0H3" />
+        </svg>
+      </button>
+
+      <!-- Send Image Button -->
+      <button id="imageButton" class="bg-blue-500 text-white p-2 ml-2 rounded hover:bg-blue-600">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+      </button>
+
+      <!-- Send Message Button -->
+      <button id="send" class="bg-blue-500 text-white px-4 py-2 ml-2 rounded hover:bg-blue-600">SEND</button>
+    </div>
   </div>
 
-  <footer>
-    Developed by <a href="https://www.facebook.com/alkayesrifat" target="_blank">Al Kayes Rifat</a> |
-    <a href="https://alkayesrifat.netlify.app/" target="_blank">My Website</a>
+  <footer class="text-center p-4 bg-gray-100 text-gray-600">
+    Developed by <a href="https://www.facebook.com/alkayesrifat" target="_blank" class="text-blue-500 hover:underline">Al Kayes Rifat</a> |
+    <a href="https://alkayesrifat.netlify.app/" target="_blank" class="text-blue-500 hover:underline">My Website</a>
   </footer>
-  
+
   <!-- Include Socket.IO script -->
   <script src="/socket.io/socket.io.js"></script>
-  
+
   <!-- Inline JavaScript -->
   <script>
     const socket = io();
     let username;
-    const form = document.getElementById('form');
     const input = document.getElementById('input');
-    const imageInput = document.getElementById('imageInput');
     const chat = document.getElementById('chat');
     const recordButton = document.getElementById('record');
+    const imageButton = document.getElementById('imageButton');
+    const imageInput = document.createElement('input');
+    imageInput.type = 'file';
+    imageInput.accept = 'image/*';
+    imageInput.style.display = 'none';
+    document.body.appendChild(imageInput);
+
     let mediaRecorder;
     let audioChunks = [];
 
@@ -322,7 +94,7 @@
     });
 
     // Handle form submission
-    form.addEventListener('submit', function(e) {
+    document.getElementById('send').addEventListener('click', function(e) {
       e.preventDefault();
       if (input.value || imageInput.files[0]) {
         const messageData = { user: username, message: input.value };
@@ -341,6 +113,11 @@
         }
         input.value = '';
       }
+    });
+
+    // Handle image button click
+    imageButton.addEventListener('click', () => {
+      imageInput.click();
     });
 
     // Handle recording audio
@@ -373,9 +150,9 @@
     // Display messages
     socket.on('chat message', function(data) {
       const messageContainer = document.createElement('div');
-      messageContainer.classList.add('message-container');
+      messageContainer.classList.add('message-container', 'mb-4');
       const message = document.createElement('div');
-      message.classList.add('message', data.user === username ? 'user' : 'other');
+      message.classList.add('p-3', 'rounded-lg', 'max-w-xs', 'break-words', data.user === username ? 'bg-green-100 ml-auto' : 'bg-gray-100');
 
       // Text message
       if (data.message) {
@@ -388,6 +165,7 @@
       if (data.image) {
         const img = document.createElement('img');
         img.src = data.image;
+        img.classList.add('mt-2', 'rounded-lg', 'max-w-full');
         message.appendChild(img);
       }
 
@@ -396,6 +174,7 @@
         const audio = document.createElement('audio');
         audio.controls = true;
         audio.src = data.audio;
+        audio.classList.add('mt-2', 'w-full');
         message.appendChild(audio);
       }
 
@@ -404,6 +183,5 @@
       chat.scrollTop = chat.scrollHeight;
     });
   </script>
-  
 </body>
 </html>
