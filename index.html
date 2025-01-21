@@ -105,11 +105,13 @@
           reader.onload = function(event) {
             messageData.image = event.target.result;
             socket.emit('chat message', messageData);
+            appendMessage(messageData); // Display the message immediately
           };
           reader.readAsDataURL(imageInput.files[0]);
           imageInput.value = ''; // Clear file input after sending
         } else {
           socket.emit('chat message', messageData);
+          appendMessage(messageData); // Display the message immediately
         }
         input.value = '';
       }
@@ -136,7 +138,9 @@
 
             const reader = new FileReader();
             reader.onloadend = function() {
-              socket.emit('chat message', { user: username, audio: reader.result });
+              const messageData = { user: username, audio: reader.result };
+              socket.emit('chat message', messageData);
+              appendMessage(messageData); // Display the message immediately
             };
             reader.readAsDataURL(audioBlob);
             recordButton.textContent = '🎤 Record Voice';
@@ -147,8 +151,8 @@
       }
     });
 
-    // Display messages
-    socket.on('chat message', function(data) {
+    // Function to append a message to the chat area
+    function appendMessage(data) {
       const messageContainer = document.createElement('div');
       messageContainer.classList.add('message-container', 'mb-4');
       const message = document.createElement('div');
@@ -180,7 +184,12 @@
 
       messageContainer.appendChild(message);
       chat.appendChild(messageContainer);
-      chat.scrollTop = chat.scrollHeight;
+      chat.scrollTop = chat.scrollHeight; // Scroll to the bottom
+    }
+
+    // Display messages received from the server
+    socket.on('chat message', function(data) {
+      appendMessage(data);
     });
   </script>
 </body>
