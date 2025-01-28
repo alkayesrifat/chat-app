@@ -1,389 +1,369 @@
-
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <title>Chat Room By Al Kayes Rifat</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        /* Reset CSS */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Premium Chat Room</title>
+  <style>
+    /* Root variables for theme */
+    :root {
+      --bg-color-light: #e6ebf0;
+      --text-color-light: #2b2d42;
+      --bg-color-dark: #1e1e1e;
+      --text-color-dark: #eaeaea;
+      --primary-color: #5a67d8;
+      --user-msg-bg: #d0e0ff;
+      --other-msg-bg: #f0f0f0;
+      --user-msg-bg-dark: #7289da;
+      --other-msg-bg-dark: #40444b;
+      --chat-bg-light: #ffffff;
+      --chat-bg-dark: #2c2f33;
+    }
 
-        /* Root variables for easy theming */
-        :root {
-            --primary-color: #007bff; /* Blue color for buttons and user messages */
-            --primary-dark-color: #0056b3; /* Darker blue for hover states */
-            --secondary-color: #f8f9fa; /* Light background color */
-            --background-color: #ffffff; /* White background */
-            --text-color: #333; /* Dark text color */
-            --message-user-bg: #007bff; /* User message background */
-            --message-other-bg: #e9ecef; /* Other message background */
-            --message-text-color: #ffffff; /* User message text color */
-        }
 
-        /* General Styles */
-        body {
-            font-family: 'Roboto', Arial, sans-serif;
-            background-color: var(--secondary-color);
-            color: var(--text-color);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
+    /* Dark theme */
+    .dark-theme {
+      --bg-color: var(--bg-color-dark);
+      --text-color: var(--text-color-dark);
+      --user-msg-bg: var(--user-msg-bg-dark);
+      --other-msg-bg: var(--other-msg-bg-dark);
+      --chat-bg: var(--chat-bg-dark);
+    }
 
-        /* Overlay styling for username input */
-        #overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(248, 249, 250, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
 
-        #username-container {
-            background: var(--background-color);
-            padding: 40px 30px;
-            width: 90%;
-            max-width: 400px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
+    /* Light theme */
+    body {
+      --bg-color: var(--bg-color-light);
+      --text-color: var(--text-color-light);
+      --user-msg-bg: var(--user-msg-bg);
+      --other-msg-bg: var(--other-msg-bg);
+      --chat-bg: var(--chat-bg-light);
+    }
 
-        #username-container h3 {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
 
-        #username-input {
-            width: 100%;
-            padding: 15px;
-            font-size: 16px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            margin-top: 10px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
+    /* General page styling */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 20px;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    h2 {
+      margin-bottom: 20px;
+    }
 
-        #username-input:focus {
-            border-color: var(--primary-color);
-        }
 
-        #username-submit {
-            width: 100%;
-            padding: 15px;
-            margin-top: 20px;
-            border: none;
-            border-radius: 5px;
-            background-color: var(--primary-color);
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+    /* Overlay styling */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    #username-container {
+      background: var(--chat-bg);
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      color: var(--text-color);
+    }
 
-        #username-submit:hover {
-            background-color: var(--primary-dark-color);
-        }
 
-        /* Chat container styling */
-        #chat-container {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            display: none;
-        }
+    #username-input {
+      width: 100%;
+      padding: 15px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+      outline: none;
+    }
+    #username-submit {
+      width: 100%;
+      padding: 12px;
+      margin-top: 15px;
+      border: none;
+      border-radius: 5px;
+      background-color: var(--primary-color);
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-        #chat {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            background-color: var(--background-color);
-        }
 
-        #form {
-            display: flex;
-            align-items: center;
-            padding: 10px 20px;
-            background-color: var(--background-color);
-            border-top: 1px solid #ccc;
-        }
+    /* Chat container styling */
+    #chat-container {
+      display: none;
+      width: 100%;
+      max-width: 600px;
+    }
+    #chat {
+      height: 500px;
+      border-radius: 8px;
+      overflow-y: auto;
+      padding: 15px;
+      background-color: var(--chat-bg);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin-bottom: 10px;
+      transition: background-color 0.3s;
+    }
 
-        #input,
-        #imageInput {
-            flex: 1;
-            padding: 12px 15px;
-            font-size: 16px;
-            border-radius: 25px;
-            border: 1px solid #ccc;
-            outline: none;
-            margin-right: 10px;
-            transition: border-color 0.3s;
-        }
 
-        #input:focus,
-        #imageInput:focus {
-            border-color: var(--primary-color);
-        }
+    /* Form styling */
+    #form {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+    #input {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 5px;
+    }
+    #imageInput {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 14px;
+      padding: 5px;
+      margin-bottom: 5px;
+    }
+    #send, #record {
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background-color: var(--primary-color);
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
 
-        #send,
-        #record {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 25px;
-            background-color: var(--primary-color);
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            margin-left: 5px;
-            transition: background-color 0.3s;
-        }
 
-        #send:hover,
-        #record:hover {
-            background-color: var(--primary-dark-color);
-        }
+    /* Message bubble styling */
+    .message-container {
+      display: flex;
+      margin-bottom: 10px;
+    }
+    .message.user {
+      background-color: var(--user-msg-bg);
+      border-radius: 15px 15px 0 15px;
+      padding: 10px;
+      margin-left: auto;
+      max-width: 70%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s;
+    }
+    .message.other {
+      background-color: var(--other-msg-bg);
+      border-radius: 15px 15px 15px 0;
+      padding: 10px;
+      margin-right: auto;
+      max-width: 70%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s;
+    }
+    .message img, .message audio {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-top: 5px;
+      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    }
 
-        /* Message bubble styling */
-        .message-container {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 15px;
-        }
 
-        .message {
-            display: inline-block;
-            padding: 12px 20px;
-            border-radius: 25px;
-            max-width: 80%;
-            word-wrap: break-word;
-            position: relative;
-            font-size: 16px;
-        }
+    /* Responsive design */
+    @media (max-width: 768px) {
+      #chat-container {
+        max-width: 100%;
+      }
+      #chat {
+        height: 400px;
+      }
+    }
 
-        .message.user {
-            background-color: var(--message-user-bg);
-            color: var(--message-text-color);
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
-        }
 
-        .message.other {
-            background-color: var(--message-other-bg);
-            align-self: flex-start;
-            border-bottom-left-radius: 5px;
-        }
+    /* Theme toggle button */
+    #theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-        .message.user::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            right: -10px;
-            width: 0;
-            height: 0;
-            border-left: 10px solid var(--message-user-bg);
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-        }
 
-        .message.other::after {
-            content: "";
-            position: absolute;
-            bottom: 0;
-            left: -10px;
-            width: 0;
-            height: 0;
-            border-right: 10px solid var(--message-other-bg);
-            border-top: 10px solid transparent;
-            border-bottom: 10px solid transparent;
-        }
-
-        .message img,
-        .message audio {
-            max-width: 100%;
-            border-radius: 15px;
-            margin-top: 10px;
-            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Scrollbar styling */
-        #chat::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        #chat::-webkit-scrollbar-thumb {
-            background-color: rgba(0, 0, 0, 0.2);
-            border-radius: 4px;
-        }
-
-        /* Footer styling */
-        footer {
-            text-align: center;
-            padding: 10px;
-            font-size: 14px;
-            color: #555;
-            background-color: var(--background-color);
-        }
-
-        footer a {
-            color: var(--primary-color);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Responsive design */
-        @media (max-width: 768px) {
-            #form {
-                flex-direction: column;
-                padding: 10px;
-            }
-
-            #input,
-            #imageInput {
-                margin-right: 0;
-                margin-bottom: 10px;
-                border-radius: 5px;
-            }
-
-            #send,
-            #record {
-                width: 100%;
-                margin-left: 0;
-                margin-bottom: 10px;
-                border-radius: 5px;
-            }
-
-            .message {
-                max-width: 100%;
-            }
-        }
-    </style>
+    footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: var(--text-color);
+    }
+  </style>
 </head>
-
 <body>
-    <div id="overlay">
-        <div id="username-container">
-            <h3>Enter Your Username</h3>
-            <input id="username-input" placeholder="Type your username..." />
-            <button id="username-submit">Enter Chat</button>
-        </div>
+  <h2>Premium Chat Room</h2>
+  <button id="theme-toggle">Toggle Theme</button>
+
+
+  <!-- Username overlay -->
+  <div id="overlay">
+    <div id="username-container">
+      <h3>Enter Your Username</h3>
+      <input id="username-input" placeholder="Type your username..." />
+      <button id="username-submit">Enter Chat</button>
     </div>
-    <div id="chat-container">
-        <div id="chat"></div>
-        <form id="form" action="">
-            <input id="input" autocomplete="off" placeholder="Type a message..." />
-            <input type="file" id="imageInput" accept="image/*" />
-            <button id="send">Send</button>
-            <button type="button" id="record">🎤 Record Voice</button>
-        </form>
-    </div>
-    <footer>
-        Developed by <a href="https://www.facebook.com/alkayesrifat" target="_blank">Al Kayes Rifat</a> |
-        <a href="https://alkayesrifat.netlify.app/" target="_blank">My Website</a>
-    </footer>
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        const socket = io();
-        let username;
-        const form = document.getElementById('form');
-        const input = document.getElementById('input');
-        const imageInput = document.getElementById('imageInput');
-        const chat = document.getElementById('chat');
-        const recordButton = document.getElementById('record');
-        let mediaRecorder;
-        let audioChunks = [];
+  </div>
 
-        document.getElementById('username-submit').addEventListener('click', () => {
-            username = document.getElementById('username-input').value.trim();
-            if (username) {
-                document.getElementById('overlay').style.display = 'none';
-                document.getElementById('chat-container').style.display = 'flex';
-            }
-        });
 
-        form.addEventListener('submit', function (e) {
-            e.preventDefault();
-            if (input.value || imageInput.files[0]) {
-                const messageData = { user: username, message: input.value };
-                if (imageInput.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = function (event) {
-                        messageData.image = event.target.result;
-                        socket.emit('chat message', messageData);
-                    };
-                    reader.readAsDataURL(imageInput.files[0]);
-                    imageInput.value = '';
-                } else {
-                    socket.emit('chat message', messageData);
-                }
-                input.value = '';
-            }
-        });
+  <!-- Chat container -->
+  <div id="chat-container">
+    <div id="chat"></div>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" placeholder="Type a message..." />
+      <input type="file" id="imageInput" accept="image/*" />
+      <button id="send">Send</button>
+      <button type="button" id="record">🎤 Record Voice</button>
+    </form>
+  </div>
 
-        recordButton.addEventListener('click', () => {
-            if (!mediaRecorder || mediaRecorder.state === 'inactive') {
-                navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
-                    mediaRecorder = new MediaRecorder(stream);
-                    mediaRecorder.start();
-                    recordButton.textContent = '⏹️ Stop Recording';
-                    mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
-                    mediaRecorder.onstop = () => {
-                        const audioBlob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
-                        audioChunks = [];
-                        const reader = new FileReader();
-                        reader.onloadend = function () {
-                            socket.emit('chat message', { user: username, audio: reader.result });
-                        };
-                        reader.readAsDataURL(audioBlob);
-                        recordButton.textContent = '🎤 Record Voice';
-                    };
-                });
-            } else {
-                mediaRecorder.stop();
-            }
-        });
 
-        socket.on('chat message', function (data) {
-            const messageContainer = document.createElement('div');
-            messageContainer.classList.add('message-container');
-            const message = document.createElement('div');
-            message.classList.add('message', data.user === username ? 'user' : 'other');
-            if (data.message) {
-                const messageText = document.createElement('span');
-                messageText.textContent = data.message;
-                message.appendChild(messageText);
-            }
-            if (data.image) {
-                const img = document.createElement('img');
-                img.src = data.image;
-                message.appendChild(img);
-            }
-            if (data.audio) {
-                const audio = document.createElement('audio');
-                audio.controls = true;
-                audio.src = data.audio;
-                message.appendChild(audio);
-            }
-            messageContainer.appendChild(message);
-            chat.appendChild(messageContainer);
-            chat.scrollTop = chat.scrollHeight;
+  <footer>
+    Developed by <a href="https://www.facebook.com/alkayesrifatt" target="_blank">Al Kayes Rifat</a> |
+    <a href="https://elegant-peony-f9cb39.netlify.app/" target="_blank">My Website</a>
+  </footer>
+
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    let username;
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const imageInput = document.getElementById('imageInput');
+    const chat = document.getElementById('chat');
+    const recordButton = document.getElementById('record');
+    let mediaRecorder;
+    let audioChunks = [];
+
+
+    // Set username
+    document.getElementById('username-submit').addEventListener('click', () => {
+      username = document.getElementById('username-input').value.trim();
+      if (username) {
+        document.getElementById('overlay').style.display = 'none';
+        document.getElementById('chat-container').style.display = 'block';
+      }
+    });
+
+
+    // Handle form submission
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (input.value || imageInput.files[0]) {
+        const messageData = { user: username, message: input.value };
+
+
+        // Handle image file
+        if (imageInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            messageData.image = event.target.result;
+            socket.emit('chat message', messageData);
+          };
+          reader.readAsDataURL(imageInput.files[0]);
+          imageInput.value = ''; // Clear file input after sending
+        } else {
+          socket.emit('chat message', messageData);
+        }
+        input.value = '';
+      }
+    });
+
+
+    // Handle recording audio
+    recordButton.addEventListener('click', () => {
+      if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.start();
+          recordButton.textContent = '⏹️ Stop Recording';
+
+
+          mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
+
+
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
+            audioChunks = []; // Reset chunks for next recording
+
+
+            const reader = new FileReader();
+            reader.onloadend = function() {
+              socket.emit('chat message', { user: username, audio: reader.result });
+            };
+            reader.readAsDataURL(audioBlob);
+            recordButton.textContent = '🎤 Record Voice';
+          };
         });
-    </script>
+      } else {
+        mediaRecorder.stop();
+      }
+    });
+
+
+    // Display messages
+    socket.on('chat message', function(data) {
+      const messageContainer = document.createElement('div');
+      messageContainer.classList.add('message-container');
+      const message = document.createElement('div');
+      message.classList.add('message', data.user === username ? 'user' : 'other');
+
+
+      // Text message
+      if (data.message) message.textContent = `${data.user}: ${data.message}`;
+     
+      // Image message
+      if (data.image) {
+        const img = document.createElement('img');
+        img.src = data.image;
+        message.appendChild(img);
+      }
+
+
+      // Audio message
+      if (data.audio) {
+        const audio = document.createElement('audio');
+        audio.controls = true;
+        audio.src = data.audio;
+        message.appendChild(audio);
+      }
+
+
+      messageContainer.appendChild(message);
+      chat.appendChild(messageContainer);
+      chat.scrollTop = chat.scrollHeight;
+    });
+  </script>
 </body>
-
 </html>
+
