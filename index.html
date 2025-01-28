@@ -7,7 +7,7 @@
   <style>
     /* Root variables for theme */
     :root {
-      --bg-color-light: #e6ebf0;
+      --bg-color-light: #f5f7fa;
       --text-color-light: #2b2d42;
       --bg-color-dark: #1e1e1e;
       --text-color-dark: #eaeaea;
@@ -18,8 +18,9 @@
       --other-msg-bg-dark: #40444b;
       --chat-bg-light: #ffffff;
       --chat-bg-dark: #2c2f33;
+      --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
-
 
     /* Dark theme */
     .dark-theme {
@@ -28,8 +29,8 @@
       --user-msg-bg: var(--user-msg-bg-dark);
       --other-msg-bg: var(--other-msg-bg-dark);
       --chat-bg: var(--chat-bg-dark);
+      --shadow: var(--shadow-dark);
     }
-
 
     /* Light theme */
     body {
@@ -38,12 +39,12 @@
       --user-msg-bg: var(--user-msg-bg);
       --other-msg-bg: var(--other-msg-bg);
       --chat-bg: var(--chat-bg-light);
+      --shadow: var(--shadow-light);
     }
-
 
     /* General page styling */
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -53,10 +54,11 @@
       padding: 20px;
       transition: background-color 0.3s, color 0.3s;
     }
+
     h2 {
       margin-bottom: 20px;
+      color: var(--text-color);
     }
-
 
     /* Overlay styling */
     #overlay {
@@ -71,17 +73,17 @@
       align-items: center;
       z-index: 10;
     }
+
     #username-container {
       background: var(--chat-bg);
       padding: 40px 30px;
       width: 100%;
       max-width: 400px;
       border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--shadow);
       text-align: center;
       color: var(--text-color);
     }
-
 
     #username-input {
       width: 100%;
@@ -91,7 +93,10 @@
       border: 1px solid #ccc;
       margin-top: 10px;
       outline: none;
+      background-color: var(--chat-bg);
+      color: var(--text-color);
     }
+
     #username-submit {
       width: 100%;
       padding: 12px;
@@ -102,8 +107,12 @@
       color: white;
       font-size: 16px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
 
+    #username-submit:hover {
+      background-color: #434190;
+    }
 
     /* Chat container styling */
     #chat-container {
@@ -111,17 +120,17 @@
       width: 100%;
       max-width: 600px;
     }
+
     #chat {
       height: 500px;
       border-radius: 8px;
       overflow-y: auto;
       padding: 15px;
       background-color: var(--chat-bg);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      box-shadow: var(--shadow);
       margin-bottom: 10px;
       transition: background-color 0.3s;
     }
-
 
     /* Form styling */
     #form {
@@ -129,6 +138,7 @@
       flex-direction: column;
       width: 100%;
     }
+
     #input {
       padding: 10px;
       border: 1px solid #ccc;
@@ -136,14 +146,20 @@
       font-size: 14px;
       outline: none;
       margin-bottom: 5px;
+      background-color: var(--chat-bg);
+      color: var(--text-color);
     }
+
     #imageInput {
       border: 1px solid #ccc;
       border-radius: 5px;
       font-size: 14px;
       padding: 5px;
       margin-bottom: 5px;
+      background-color: var(--chat-bg);
+      color: var(--text-color);
     }
+
     #send, #record {
       padding: 10px;
       border: none;
@@ -153,50 +169,56 @@
       cursor: pointer;
       font-size: 14px;
       margin-bottom: 5px;
+      transition: background-color 0.3s;
     }
 
+    #send:hover, #record:hover {
+      background-color: #434190;
+    }
 
     /* Message bubble styling */
     .message-container {
       display: flex;
       margin-bottom: 10px;
     }
+
     .message.user {
       background-color: var(--user-msg-bg);
       border-radius: 15px 15px 0 15px;
       padding: 10px;
       margin-left: auto;
       max-width: 70%;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--shadow);
       transition: background-color 0.3s;
     }
+
     .message.other {
       background-color: var(--other-msg-bg);
       border-radius: 15px 15px 15px 0;
       padding: 10px;
       margin-right: auto;
       max-width: 70%;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--shadow);
       transition: background-color 0.3s;
     }
+
     .message img, .message audio {
       max-width: 100%;
       border-radius: 10px;
       margin-top: 5px;
-      box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+      box-shadow: var(--shadow);
     }
-
 
     /* Responsive design */
     @media (max-width: 768px) {
       #chat-container {
         max-width: 100%;
       }
+
       #chat {
         height: 400px;
       }
     }
-
 
     /* Theme toggle button */
     #theme-toggle {
@@ -206,24 +228,41 @@
       background-color: var(--primary-color);
       color: white;
       border: none;
-      border-radius: 20px;
-      padding: 8px 12px;
+      border-radius: 50%;
+      padding: 10px;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      transition: background-color 0.3s;
     }
 
+    #theme-toggle:hover {
+      background-color: #434190;
+    }
 
     footer {
       margin-top: 20px;
       font-size: 12px;
       color: var(--text-color);
     }
+
+    footer a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
   <h2>Premium Chat Room</h2>
-  <button id="theme-toggle">Toggle Theme</button>
-
+  <button id="theme-toggle">🌓</button>
 
   <!-- Username overlay -->
   <div id="overlay">
@@ -233,7 +272,6 @@
       <button id="username-submit">Enter Chat</button>
     </div>
   </div>
-
 
   <!-- Chat container -->
   <div id="chat-container">
@@ -246,12 +284,10 @@
     </form>
   </div>
 
-
   <footer>
-    Developed by <a href="https://www.facebook.com/alkayesrifatt" target="_blank">Al Kayes Rifat</a> |
+    Developed by <a href="https://www.facebook.com/alkayesrifat" target="_blank">Al Kayes Rifat</a> |
     <a href="https://elegant-peony-f9cb39.netlify.app/" target="_blank">My Website</a>
   </footer>
-
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
@@ -262,9 +298,16 @@
     const imageInput = document.getElementById('imageInput');
     const chat = document.getElementById('chat');
     const recordButton = document.getElementById('record');
+    const themeToggle = document.getElementById('theme-toggle');
     let mediaRecorder;
     let audioChunks = [];
 
+    // Theme toggle functionality
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-theme');
+      const isDarkTheme = document.body.classList.contains('dark-theme');
+      themeToggle.textContent = isDarkTheme ? '🌞' : '🌓';
+    });
 
     // Set username
     document.getElementById('username-submit').addEventListener('click', () => {
@@ -275,13 +318,11 @@
       }
     });
 
-
     // Handle form submission
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       if (input.value || imageInput.files[0]) {
         const messageData = { user: username, message: input.value };
-
 
         // Handle image file
         if (imageInput.files[0]) {
@@ -299,7 +340,6 @@
       }
     });
 
-
     // Handle recording audio
     recordButton.addEventListener('click', () => {
       if (!mediaRecorder || mediaRecorder.state === 'inactive') {
@@ -308,14 +348,11 @@
           mediaRecorder.start();
           recordButton.textContent = '⏹️ Stop Recording';
 
-
           mediaRecorder.ondataavailable = (event) => audioChunks.push(event.data);
-
 
           mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/ogg; codecs=opus' });
             audioChunks = []; // Reset chunks for next recording
-
 
             const reader = new FileReader();
             reader.onloadend = function() {
@@ -330,7 +367,6 @@
       }
     });
 
-
     // Display messages
     socket.on('chat message', function(data) {
       const messageContainer = document.createElement('div');
@@ -338,17 +374,15 @@
       const message = document.createElement('div');
       message.classList.add('message', data.user === username ? 'user' : 'other');
 
-
       // Text message
       if (data.message) message.textContent = `${data.user}: ${data.message}`;
-     
+
       // Image message
       if (data.image) {
         const img = document.createElement('img');
         img.src = data.image;
         message.appendChild(img);
       }
-
 
       // Audio message
       if (data.audio) {
@@ -358,7 +392,6 @@
         message.appendChild(audio);
       }
 
-
       messageContainer.appendChild(message);
       chat.appendChild(messageContainer);
       chat.scrollTop = chat.scrollHeight;
@@ -366,4 +399,3 @@
   </script>
 </body>
 </html>
-
