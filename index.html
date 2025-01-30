@@ -307,6 +307,149 @@
     footer a:hover {
       text-decoration: underline;
     }
+
+    /* Typing indicator */
+    #typing-indicator {
+      font-size: 12px;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    /* Message timestamp */
+    .timestamp {
+      font-size: 10px;
+      color: var(--text-color);
+      margin-top: 4px;
+    }
+
+    /* Message reactions */
+    .reactions {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .reaction {
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    /* Message edit/delete buttons */
+    .message-actions {
+      display: none;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .message-container:hover .message-actions {
+      display: flex;
+    }
+
+    .message-actions button {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* Read receipts */
+    .read-receipt {
+      font-size: 10px;
+      color: var(--text-color);
+      margin-top: 4px;
+    }
+
+    /* Avatars */
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      margin-right: 8px;
+      background-color: var(--primary-color);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* Search bar */
+    #search-bar {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      margin-bottom: 10px;
+      background-color: var(--chat-bg);
+      color: var(--text-color);
+      transition: border-color var(--transition-speed);
+    }
+
+    /* Pin button */
+    .pin-button {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 8px;
+    }
+
+    /* File input */
+    #fileInput {
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      padding: 8px;
+      background-color: var(--chat-bg);
+      color: var(--text-color);
+      transition: border-color var(--transition-speed);
+    }
+
+    #fileInput:focus {
+      border-color: var(--primary-color);
+    }
+
+    /* Voice message playback speed */
+    #playback-speed {
+      margin-top: 10px;
+    }
+
+    /* Markdown support */
+    .markdown {
+      font-size: 14px;
+    }
+
+    /* User status */
+    .user-status {
+      font-size: 12px;
+      color: var(--text-color);
+      margin-left: 8px;
+    }
+
+    /* Chat rooms */
+    #chat-rooms {
+      margin-bottom: 10px;
+    }
+
+    /* Message translation */
+    .translate-button {
+      background: none;
+      border: none;
+      color: var(--primary-color);
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 8px;
+    }
+
+    /* Gamification */
+    .gamification {
+      font-size: 12px;
+      color: var(--text-color);
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -324,13 +467,21 @@
 
   <!-- Chat container -->
   <div id="chat-container">
+    <input type="text" id="search-bar" placeholder="Search messages..." />
     <div id="chat"></div>
     <form id="form" action="">
       <input id="input" autocomplete="off" placeholder="Type a message..." />
       <input type="file" id="imageInput" accept="image/*" />
+      <input type="file" id="fileInput" accept=".pdf,.doc,.docx" />
       <button id="send">Send</button>
       <button type="button" id="record">🎤 Record Voice</button>
+      <select id="playback-speed">
+        <option value="1">1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
     </form>
+    <div id="typing-indicator"></div>
   </div>
 
   <footer>
@@ -345,11 +496,15 @@
     const form = document.getElementById('form');
     const input = document.getElementById('input');
     const imageInput = document.getElementById('imageInput');
+    const fileInput = document.getElementById('fileInput');
     const chat = document.getElementById('chat');
     const recordButton = document.getElementById('record');
     const themeToggle = document.getElementById('theme-toggle');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const searchBar = document.getElementById('search-bar');
     let mediaRecorder;
     let audioChunks = [];
+    let typingTimeout;
 
     // Theme toggle functionality
     themeToggle.addEventListener('click', () => {
@@ -370,7 +525,7 @@
     // Handle form submission
     form.addEventListener('submit', function(e) {
       e.preventDefault();
-      if (input.value || imageInput.files[0]) {
+      if (input.value || imageInput.files[0] || fileInput.files[0]) {
         const messageData = { user: username, message: input.value };
 
         // Handle image file
@@ -382,7 +537,20 @@
           };
           reader.readAsDataURL(imageInput.files[0]);
           imageInput.value = ''; // Clear file input after sending
-        } else {
+        }
+
+        // Handle file
+        if (fileInput.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            messageData.file = event.target.result;
+            socket.emit('chat message', messageData);
+          };
+          reader.readAsDataURL(fileInput.files[0]);
+          fileInput.value = ''; // Clear file input after sending
+        }
+
+        if (!imageInput.files[0] && !fileInput.files[0]) {
           socket.emit('chat message', messageData);
         }
         input.value = '';
@@ -423,6 +591,12 @@
       const message = document.createElement('div');
       message.classList.add('message', data.user === username ? 'user' : 'other');
 
+      // Add avatar
+      const avatar = document.createElement('div');
+      avatar.classList.add('avatar');
+      avatar.textContent = data.user.charAt(0).toUpperCase();
+      messageContainer.appendChild(avatar);
+
       // Add username
       const usernameElement = document.createElement('div');
       usernameElement.classList.add('username');
@@ -443,6 +617,15 @@
         message.appendChild(img);
       }
 
+      // File message
+      if (data.file) {
+        const fileLink = document.createElement('a');
+        fileLink.href = data.file;
+        fileLink.textContent = 'Download File';
+        fileLink.download = 'file';
+        message.appendChild(fileLink);
+      }
+
       // Audio message
       if (data.audio) {
         const audio = document.createElement('audio');
@@ -451,10 +634,135 @@
         message.appendChild(audio);
       }
 
+      // Message timestamp
+      const timestamp = document.createElement('div');
+      timestamp.classList.add('timestamp');
+      timestamp.textContent = new Date().toLocaleTimeString();
+      message.appendChild(timestamp);
+
+      // Message reactions
+      const reactions = document.createElement('div');
+      reactions.classList.add('reactions');
+      const reactionEmojis = ['👍', '❤️', '😂'];
+      reactionEmojis.forEach(emoji => {
+        const reaction = document.createElement('span');
+        reaction.classList.add('reaction');
+        reaction.textContent = emoji;
+        reaction.addEventListener('click', () => {
+          // Handle reaction click
+        });
+        reactions.appendChild(reaction);
+      });
+      message.appendChild(reactions);
+
+      // Message edit/delete buttons
+      if (data.user === username) {
+        const messageActions = document.createElement('div');
+        messageActions.classList.add('message-actions');
+        const editButton = document.createElement('button');
+        editButton.textContent = 'Edit';
+        editButton.addEventListener('click', () => {
+          // Handle edit click
+        });
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => {
+          // Handle delete click
+        });
+        messageActions.appendChild(editButton);
+        messageActions.appendChild(deleteButton);
+        message.appendChild(messageActions);
+      }
+
+      // Read receipts
+      const readReceipt = document.createElement('div');
+      readReceipt.classList.add('read-receipt');
+      readReceipt.textContent = 'Seen';
+      message.appendChild(readReceipt);
+
       messageContainer.appendChild(message);
       chat.appendChild(messageContainer);
       chat.scrollTop = chat.scrollHeight;
     });
+
+    // Typing indicator
+    input.addEventListener('input', () => {
+      clearTimeout(typingTimeout);
+      socket.emit('typing', { user: username });
+      typingTimeout = setTimeout(() => {
+        socket.emit('stop typing', { user: username });
+      }, 1000);
+    });
+
+    socket.on('typing', (data) => {
+      typingIndicator.textContent = `${data.user} is typing...`;
+    });
+
+    socket.on('stop typing', () => {
+      typingIndicator.textContent = '';
+    });
+
+    // Search messages
+    searchBar.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase();
+      const messages = document.querySelectorAll('.message');
+      messages.forEach(message => {
+        const text = message.textContent.toLowerCase();
+        message.style.display = text.includes(query) ? 'block' : 'none';
+      });
+    });
+
+    // Pin message
+    const pinButton = document.createElement('button');
+    pinButton.classList.add('pin-button');
+    pinButton.textContent = 'Pin';
+    pinButton.addEventListener('click', () => {
+      // Handle pin click
+    });
+    chat.appendChild(pinButton);
+
+    // Voice message playback speed
+    const playbackSpeed = document.getElementById('playback-speed');
+    playbackSpeed.addEventListener('change', (e) => {
+      const speed = e.target.value;
+      const audios = document.querySelectorAll('audio');
+      audios.forEach(audio => {
+        audio.playbackRate = speed;
+      });
+    });
+
+    // Markdown support
+    const markdown = document.createElement('div');
+    markdown.classList.add('markdown');
+    markdown.textContent = 'Markdown support';
+    chat.appendChild(markdown);
+
+    // User status
+    const userStatus = document.createElement('div');
+    userStatus.classList.add('user-status');
+    userStatus.textContent = 'Online';
+    chat.appendChild(userStatus);
+
+    // Chat rooms
+    const chatRooms = document.createElement('div');
+    chatRooms.id = 'chat-rooms';
+    chatRooms.textContent = 'Chat Rooms';
+    chat.appendChild(chatRooms);
+
+    // Message translation
+    const translateButton = document.createElement('button');
+    translateButton.classList.add('translate-button');
+    translateButton.textContent = 'Translate';
+    translateButton.addEventListener('click', () => {
+      // Handle translate click
+    });
+    chat.appendChild(translateButton);
+
+    // Gamification
+    const gamification = document.createElement('div');
+    gamification.classList.add('gamification');
+    gamification.textContent = 'Gamification';
+    chat.appendChild(gamification);
   </script>
 </body>
 </html>
