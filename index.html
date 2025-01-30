@@ -244,6 +244,40 @@
       margin-bottom: 4px;
     }
 
+    .message .timestamp {
+      font-size: 10px;
+      color: var(--text-color);
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    /* Typing indicator */
+    #typing-indicator {
+      font-size: 12px;
+      color: var(--text-color);
+      margin-bottom: 10px;
+    }
+
+    /* Online users list */
+    #online-users {
+      margin-top: 20px;
+      font-size: 14px;
+      color: var(--text-color);
+    }
+
+    #online-users h3 {
+      margin-bottom: 10px;
+    }
+
+    #online-users ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    #online-users li {
+      margin-bottom: 5px;
+    }
+
     /* Responsive design */
     @media (max-width: 768px) {
       #chat-container {
@@ -325,12 +359,17 @@
   <!-- Chat container -->
   <div id="chat-container">
     <div id="chat"></div>
+    <div id="typing-indicator"></div>
     <form id="form" action="">
       <input id="input" autocomplete="off" placeholder="Type a message..." />
       <input type="file" id="imageInput" accept="image/*" />
       <button id="send">Send</button>
       <button type="button" id="record">🎤 Record Voice</button>
     </form>
+    <div id="online-users">
+      <h3>Online Users</h3>
+      <ul id="users-list"></ul>
+    </div>
   </div>
 
   <footer>
@@ -348,8 +387,11 @@
     const chat = document.getElementById('chat');
     const recordButton = document.getElementById('record');
     const themeToggle = document.getElementById('theme-toggle');
+    const typingIndicator = document.getElementById('typing-indicator');
+    const usersList = document.getElementById('users-list');
     let mediaRecorder;
     let audioChunks = [];
+    let typingTimeout;
 
     // Theme toggle functionality
     themeToggle.addEventListener('click', () => {
@@ -364,6 +406,7 @@
       if (username) {
         document.getElementById('overlay').style.display = 'none';
         document.getElementById('chat-container').style.display = 'block';
+        socket.emit('new user', username);
       }
     });
 
@@ -371,7 +414,7 @@
     form.addEventListener('submit', function(e) {
       e.preventDefault();
       if (input.value || imageInput.files[0]) {
-        const messageData = { user: username, message: input.value };
+        const messageData = { user: username, message: input.value, timestamp: new Date().toLocaleTimeString() };
 
         // Handle image file
         if (imageInput.files[0]) {
@@ -405,7 +448,7 @@
 
             const reader = new FileReader();
             reader.onloadend = function() {
-              socket.emit('chat message', { user: username, audio: reader.result });
+              socket.emit('chat message', { user: username, audio: reader.result, timestamp: new Date().toLocaleTimeString() });
             };
             reader.readAsDataURL(audioBlob);
             recordButton.textContent = '🎤 Record Voice';
@@ -451,9 +494,42 @@
         message.appendChild(audio);
       }
 
+      // Add timestamp
+      const timestampElement = document.createElement('div');
+      timestampElement.classList.add('timestamp');
+      timestampElement.textContent = data.timestamp;
+      message.appendChild(timestampElement);
+
       messageContainer.appendChild(message);
       chat.appendChild(messageContainer);
       chat.scrollTop = chat.scrollHeight;
+    });
+
+    // Handle typing indicator
+    input.addEventListener('input', () => {
+      socket.emit('typing', username);
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        socket.emit('stop typing', username);
+      }, 1000);
+    });
+
+    socket.on('typing', (user) => {
+      typingIndicator.textContent = `${user} is typing...`;
+    });
+
+    socket.on('stop typing', () => {
+      typingIndicator.textContent = '';
+    });
+
+    // Update online users list
+    socket.on('user list', (users) => {
+      usersList.innerHTML = '';
+      users.forEach(user => {
+        const li = document.createElement('li');
+        li.textContent = user;
+        usersList.appendChild(li);
+      });
     });
   </script>
 </body>
